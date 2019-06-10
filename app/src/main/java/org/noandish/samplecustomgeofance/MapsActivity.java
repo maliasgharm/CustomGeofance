@@ -67,7 +67,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 customGeofance.changeLocation(new LatLngRange(location.getLatitude(), location.getLongitude()));
 
-
             }
 
             @Override
