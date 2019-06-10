@@ -7,19 +7,19 @@ import java.util.ArrayList
  * Created by Aliasghar on 12.08.2018 - 12 : 45
  */
 
-class RangePolygon {
+class CustomGeofance {
     private var onEnterRangePolygonListener: OnEnterRangePolygonListener? = null
     private var paramsRangePolygons = ArrayList<ParamsRangePolygons>()
     var lastLocation: LatLngRange? = null
 
-    fun setOnEnterRangePolygonListener(onEnterRangePolygonListener: OnEnterRangePolygonListener): RangePolygon {
+    fun setOnEnterRangePolygonListener(onEnterRangePolygonListener: OnEnterRangePolygonListener): CustomGeofance {
         this.onEnterRangePolygonListener = onEnterRangePolygonListener
         if (lastLocation != null)
             changeLocation(lastLocation!!)
         return this
     }
 
-    fun addRangeWithListener(paramsRangePolygon: ParamsRangePolygons): RangePolygon {
+    fun addAllRange(paramsRangePolygon: ParamsRangePolygons): CustomGeofance {
         this.paramsRangePolygons.add(paramsRangePolygon)
         if (lastLocation != null)
             changeLocation(lastLocation!!)
@@ -39,8 +39,8 @@ class RangePolygon {
     }
 
     interface OnEnterRangePolygonListener {
-        fun onEntered(any: ParamsRangePolygons)
-        fun onExited(paramsRangePolygon: ParamsRangePolygons)
+        fun onEnteredGeo(any: ParamsRangePolygons)
+        fun onExitedGeo(paramsRangePolygon: ParamsRangePolygons)
     }
 
     fun changeLocation(tap: LatLngRange) {
@@ -48,12 +48,16 @@ class RangePolygon {
         for (paramsRangePolygons in paramsRangePolygons) {
             val vertices = paramsRangePolygons.vertices
             var intersectCount = 0
+            if (vertices.size <= 0)
+                break
             for (j in 0 until vertices.size - 1) {
-                Log.w("point","point ${vertices[j].lat } , ${vertices[j].lng }")
+                Log.w("point", "point ${vertices[j].lat} , ${vertices[j].lng}")
                 if (rayCastIntersect(tap, vertices[j], vertices[j + 1])) {
                     intersectCount++
                 }
             }
+            if (vertices.size <= 0)
+                break
             if (rayCastIntersect(tap, vertices[vertices.size - 1], vertices[0])) {
                 intersectCount++
             }
@@ -62,8 +66,8 @@ class RangePolygon {
                 paramsRangePolygons.entered = true
                 paramsRangePolygons.exited = false
                 if (onEnterRangePolygonListener != null)
-                    onEnterRangePolygonListener!!.onEntered(paramsRangePolygons)
-                paramsRangePolygons.onRangePolygonListener.onChangeStatus(
+                    onEnterRangePolygonListener!!.onEnteredGeo(paramsRangePolygons)
+                paramsRangePolygons.onRangePolygonListener?.onChangeStatus(
                     EventRangePolygon.EVENT_IN_RANGE,
                     paramsRangePolygons
                 )
@@ -72,8 +76,8 @@ class RangePolygon {
                 paramsRangePolygons.entered = false
                 paramsRangePolygons.exited = true
                 if (onEnterRangePolygonListener != null)
-                    onEnterRangePolygonListener!!.onExited(paramsRangePolygons)
-                paramsRangePolygons.onRangePolygonListener.onChangeStatus(
+                    onEnterRangePolygonListener!!.onExitedGeo(paramsRangePolygons)
+                paramsRangePolygons.onRangePolygonListener?.onChangeStatus(
                     EventRangePolygon.EVENT_OUT_RANGE,
                     paramsRangePolygons
                 )
